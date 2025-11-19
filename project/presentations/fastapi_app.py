@@ -17,19 +17,13 @@ def create_app() -> FastAPI:
     class PutLink(BaseModel):
         link: str
 
-
-
     @app.middleware("http")
     async def add_latency_header(request: Request, call_next):
         start_time = time.time()
-        try:
-            response = await call_next(request)
-        finally:
-            latency = (time.time() - start_time) * 1000
-            response.headers["X-Latency"] = f"{latency:.2f}ms"
+        response = await call_next(request)
+        latency = (time.time() - start_time) * 1000
+        response.headers["X-Latency"] = f"{latency:.2f}ms"
         return response
-
-
 
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
@@ -45,8 +39,6 @@ def create_app() -> FastAPI:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
-
-
     def _validate_and_prepare_link(link: str) -> str:
         if not link.startswith(("http://", "https://")):
             link = "https://" + link
@@ -61,8 +53,6 @@ def create_app() -> FastAPI:
 
     def _service_link_to_real(short_link: str) -> str:
         return f"http://localhost:8000/{short_link}"
-
-
 
     @app.post("/link")
     def create_link(put_link_request: PutLink) -> PutLink:

@@ -12,3 +12,4 @@ class LinkService:
 
     def get_real_link(self, link: str) -> str | None:
         return self.short_link_to_real_link.get(link)
+
